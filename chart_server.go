@@ -10,6 +10,9 @@ type ChartServer struct {
 }
 
 func (this *ChartServer) AddChart(chartanme string, chart IChart) {
+	if this.charts == nil {
+		this.charts = make(map[string]IChartInner)
+	}
 	this.charts[chartname] = chart
 }
 
