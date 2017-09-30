@@ -3,13 +3,14 @@ package gochart
 import (
 	"github.com/golang/glog"
 	"net/http"
+	"text/template"
 )
 
 type ChartServer struct {
 	charts map[string]IChartInner
 }
 
-func (this *ChartServer) AddChart(chartanme string, chart IChart) {
+func (this *ChartServer) AddChart(chartname string, chart IChartInner) {
 	if this.charts == nil {
 		this.charts = make(map[string]IChartInner)
 	}
@@ -17,7 +18,7 @@ func (this *ChartServer) AddChart(chartanme string, chart IChart) {
 }
 
 func (this *ChartServer) ListenAndServe(addr string) error {
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", this.handler)
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {})
 	return http.ListenAndServe(addr, nil)
 }
