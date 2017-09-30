@@ -1,4 +1,4 @@
-package main
+package gochart
 
 // see the resource of : http://www.freecdn.cn/libs/highcharts/
 
