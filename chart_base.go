@@ -18,6 +18,7 @@ type ChartBase struct {
 	YAxisText    string
 	XAxisNumbers string
 	ValueSuffix  string
+	SeriesName   string
 	Height       string
 	DataArray    string
 	chartArgs    map[string]string
@@ -32,6 +33,7 @@ func (this *ChartBase) Build() {
 		this.chartArgs["YAxisText"] = this.YAxisText
 		this.chartArgs["XAxisNumbers"] = this.XAxisNumbers
 		this.chartArgs["ValueSuffix"] = this.ValueSuffix
+		this.chartArgs["SeriesName"] = this.SeriesName
 		this.chartArgs["Height"] = this.Height
 	}
 	this.chartArgs["DataArray"] = this.DataArray

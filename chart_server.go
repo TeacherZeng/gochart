@@ -28,7 +28,7 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 	chartname := values.Get("query")
 
 	if _, ok := this.charts[chartname]; !ok {
-		glog.Errorln("no find the chart")
+		glog.Errorln("no find the chart, chartname =", chartname)
 		return
 	}
 
