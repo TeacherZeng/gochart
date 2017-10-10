@@ -3,6 +3,7 @@ package gochart
 import (
 	"github.com/golang/glog"
 	"net/http"
+	"os"
 	"text/template"
 )
 
@@ -20,6 +21,7 @@ func (this *ChartServer) AddChart(chartname string, chart IChartInner) {
 func (this *ChartServer) ListenAndServe(addr string) error {
 	http.HandleFunc("/", this.handler)
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {})
+	http.HandleFunc("/js/", this.js)
 	return http.ListenAndServe(addr, nil)
 }
 
@@ -43,4 +45,13 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(err.Error()))
 		}
 	}
+}
+
+func (this *ChartServer) js(w http.ResponseWriter, r *http.Request) {
+	wd, err := os.Getwd()
+	if err != nil {
+		glog.Errorln(err)
+		return
+	}
+	http.FileServer(http.Dir(wd)).ServeHTTP(w, r)
 }

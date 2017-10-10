@@ -9,7 +9,7 @@ var TemplatePieHtml = `{{define "T"}}
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Gochart - {{.ChartType}} | CodeG.cn</title>
 
-        <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
         <script type="text/javascript">
         $(function () {
             $('#container').highcharts({
@@ -67,8 +67,8 @@ var TemplatePieHtml = `{{define "T"}}
     </head>
     <body>
     
-    <script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/4.0.1/highcharts.js"></script>
-    <script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/4.0.1/modules/exporting.js"></script>
+    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <script type="text/javascript" src="/js/exporting.js"></script>
 
     <div id="container" style="min-width: 310px; height: {{.Height}}px; max-width: 600px; margin: 0 auto"></div>
 
