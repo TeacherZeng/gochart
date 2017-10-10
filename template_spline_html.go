@@ -8,9 +8,9 @@ var TemplateSplineHtml = `{{define "T"}}
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>Gochart - {{.ChartType}} | CodeG.cn</title>
-<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
+        <title>Gochart - {{.ChartType}}</title>
+        <link rel="stylesheet" href="/js/bootstrap.min.css">
+        <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
         <script type="text/javascript">
         $(function () {
             $('#container').highcharts({
@@ -86,9 +86,9 @@ var TemplateSplineHtml = `{{define "T"}}
         </script>
     </head>
     <body>
-    <script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/4.0.1/highcharts.js"></script>
-    <script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/4.0.1/modules/exporting.js"></script>
-    <script type="text/javascript" src="http://apps.bdimg.com/libs/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <script type="text/javascript" src="/js/exporting.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
     <div id="container" style="min-width: 310px; height: {{.Height}}px; margin: 0 auto"></div>
 
 <script type ="text/javascript">
