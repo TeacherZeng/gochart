@@ -25,7 +25,7 @@ type ChartBase struct {
 	chartArgs    map[string]string
 }
 
-func (this *ChartBase) Build() {
+func (this *ChartBase) BuildBase() {
 	if this.chartArgs == nil {
 		this.chartArgs = make(map[string]string)
 		this.chartArgs["ChartType"] = this.ChartType
