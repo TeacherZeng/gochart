@@ -6,7 +6,7 @@ var TemplatePieHtml = `{{define "T"}}
 <!DOCTYPE HTML>
 <html>
     <head>
-	    <meta http-equiv="refresh" content="1">
+	    <meta http-equiv="refresh" content='{{.RefreshTime}}'>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Gochart - {{.ChartType}}</title>
 
