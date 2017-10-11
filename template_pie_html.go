@@ -6,6 +6,7 @@ var TemplatePieHtml = `{{define "T"}}
 <!DOCTYPE HTML>
 <html>
     <head>
+	    <meta http-equiv="refresh" content="1">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Gochart - {{.ChartType}}</title>
 
@@ -18,7 +19,8 @@ var TemplatePieHtml = `{{define "T"}}
                     type: '{{.ChartType}}',
                     plotBackgroundColor: null,
                     plotBorderWidth: null,
-                    plotShadow: false
+                    plotShadow: false,
+                    animation: false
                 },
                 title: {
                     // text: 'Browser market shares at a specific website, 2014'
@@ -42,7 +44,13 @@ var TemplatePieHtml = `{{define "T"}}
                                 color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                             }
                         }
+                    },
+                    series: {
+                        animation: false
                     }
+                },
+                credits : {
+                    enabled: false
                 },
                 series: [{
                     // name: 'Browser share',

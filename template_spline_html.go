@@ -7,6 +7,7 @@ var TemplateSplineHtml = `{{define "T"}}
 <!DOCTYPE HTML>
 <html>
     <head>
+	    <meta http-equiv="refresh" content="1">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Gochart - {{.ChartType}}</title>
         <link rel="stylesheet" href="/js/bootstrap.min.css">
@@ -16,7 +17,8 @@ var TemplateSplineHtml = `{{define "T"}}
             $('#container').highcharts({
                 chart: {
                     // type: 'spline'
-                    type: '{{.ChartType}}'
+                    type: '{{.ChartType}}',
+                    animation:false
                                         // 默认是折线图(line)。type取值如下：
                                         // line:折线图
                                         // spline:曲线图，线条圆滑一些
@@ -58,6 +60,14 @@ var TemplateSplineHtml = `{{define "T"}}
                     align: 'right',
                     verticalAlign: 'middle',
                     borderWidth: 0
+                },
+                plotOptions: {
+                    series: {
+                        animation: false
+                    }
+                },
+                credits : {
+                    enabled: false
                 },
                 series: {{.DataArray}}
                 /*
