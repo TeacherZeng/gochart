@@ -52,6 +52,7 @@ var TemplateTimeHtml = `{{define "T"}}
                         width: 1,
                         color: '#808080'
                     }],
+                    max: {{.YMax}},
                     min: 0
                 },
                 tooltip: {
