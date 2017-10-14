@@ -1,13 +1,13 @@
 package gochart
 
 type IChart interface {
-	Update()
+	Update(now int64) []interface{}
 }
 
 type IChartInner interface {
 	IChart
 	Template() string
-	Build()
+	Build(dataArray string)
 	Data() map[string]string
 }
 
@@ -21,11 +21,10 @@ type ChartBase struct {
 	SeriesName   string
 	Height       string
 	RefreshTime  string
-	DataArray    string
 	chartArgs    map[string]string
 }
 
-func (this *ChartBase) BuildBase() {
+func (this *ChartBase) BuildBase(dataArray string) {
 	if this.chartArgs == nil {
 		this.chartArgs = make(map[string]string)
 		this.chartArgs["ChartType"] = this.ChartType
@@ -42,7 +41,7 @@ func (this *ChartBase) BuildBase() {
 		}
 		this.chartArgs["RefreshTime"] = r
 	}
-	this.chartArgs["DataArray"] = this.DataArray
+	this.chartArgs["DataArray"] = dataArray
 }
 
 func (this *ChartBase) Data() map[string]string {

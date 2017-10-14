@@ -1,10 +1,12 @@
 package gochart
 
 import (
+	"github.com/bitly/go-simplejson"
 	"github.com/golang/glog"
 	"net/http"
 	"os"
 	"text/template"
+	"time"
 )
 
 type ChartServer struct {
@@ -34,9 +36,14 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	now := time.Now().Unix()
+
 	chart := this.charts[chartname]
-	chart.Update()
-	chart.Build()
+	datas := chart.Update(now)
+	json := simplejson.New()
+	json.Set("DataArray", datas)
+	b, _ := json.Get("DataArray").Encode()
+	chart.Build(string(b))
 
 	if t, err := template.New("foo").Parse(chart.Template()); err != nil {
 		w.Write([]byte(err.Error()))
