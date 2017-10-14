@@ -37,7 +37,7 @@ var TemplateTimeHtml = `{{define "T"}}
                 },
                 xAxis: {
                     type: 'datetime',
-                    tickInterval: 1000,
+                    tickInterval: {{.TickInterval}},
                     labels: {
                         format: '{value: %H:%M:%S}'
                     }
@@ -130,7 +130,7 @@ $(function(){
 		 $(item.data).each(function(n,info){
 		     objstr += '<td>'+info+'</td>';
 		 });
-		 objstr += '<td>'+item.pointInterval+'</td>'+'</td>'+'<td>'+item.pointStart+'</td>'+'<td>'+item.pointEnd+'</td>';
+		 objstr += '</td>'+'<td>'+item.pointStart+'</td>'+'<td>'+item.pointEnd+'</td>';
 		 objstr += "</tr>";
 	});
 
