@@ -78,7 +78,7 @@ var TemplatePieHtml = `{{define "T"}}
     <script type="text/javascript" src="/js/highcharts.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
 
-    <div id="container" style="min-width: 310px; height: {{.Height}}px; max-width: 600px; margin: 0 auto"></div>
+    <div id="container" style="min-width: 310px; max-width: 600px; margin: 0 auto"></div>
 
     </body>
 </html>

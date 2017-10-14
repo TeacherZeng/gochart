@@ -99,7 +99,7 @@ var TemplateSplineHtml = `{{define "T"}}
     <script type="text/javascript" src="/js/highcharts.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-    <div id="container" style="min-width: 310px; height: {{.Height}}px; margin: 0 auto"></div>
+    <div id="container" style="min-width: 310px; margin: 0 auto"></div>
 
 <script type ="text/javascript">
 $(function(){

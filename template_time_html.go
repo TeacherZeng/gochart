@@ -118,33 +118,7 @@ var TemplateTimeHtml = `{{define "T"}}
     <script type="text/javascript" src="/js/highcharts.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-    <div id="container" style="min-width: 310px; height: {{.Height}}px; margin: 0 auto"></div>
-
-<script type ="text/javascript">
-$(function(){
-	var s = {{.DataArray}};
-	var objstr = "";
-	dataindex = 0;
-	$(s).each(function(i,item){
-		 dataindex = item.data.length;
-		 var index = i+1;
-		 objstr +='<tr><th scope="row">'+index+'</th><td>'+item.name+'</td>'
-		 $(item.data).each(function(n,info){
-		     objstr += '<td>'+info+'</td>';
-		 });
-		 objstr += '<td>'+item.pointStart+'</td>'+'<td>'+item.pointEnd+'</td>';
-		 objstr += "</tr>";
-	});
-
-	
-	$("#tb").html(objstr);
-
-})
-</script>
-
-<table id="tb"  class="table table-hover table-striped table-bordered">
-  	
-    </table>
+    <div id="container" style="min-width: 310px; margin: 0 auto"></div>
     
 </body>
 </html>

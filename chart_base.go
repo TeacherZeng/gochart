@@ -19,7 +19,6 @@ type ChartBase struct {
 	XAxisNumbers string
 	ValueSuffix  string
 	SeriesName   string
-	Height       string
 	RefreshTime  string
 	chartArgs    map[string]string
 }
@@ -34,12 +33,10 @@ func (this *ChartBase) BuildBase(dataArray string) {
 		this.chartArgs["XAxisNumbers"] = this.XAxisNumbers
 		this.chartArgs["ValueSuffix"] = this.ValueSuffix
 		this.chartArgs["SeriesName"] = this.SeriesName
-		this.chartArgs["Height"] = this.Height
-		r := "60"
-		if this.RefreshTime != "" {
-			r = this.RefreshTime
+		if this.RefreshTime == "" {
+			this.RefreshTime = "60"
 		}
-		this.chartArgs["RefreshTime"] = r
+		this.chartArgs["RefreshTime"] = this.RefreshTime
 	}
 	this.chartArgs["DataArray"] = dataArray
 }
