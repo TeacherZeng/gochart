@@ -10,6 +10,16 @@ var TemplateTimeHtml = `{{define "T"}}
 	    <meta http-equiv="refresh" content='{{.RefreshTime}}'>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Gochart - {{.Title}}</title>
+        <style>
+            .center{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width:100%;
+                height: 50%;
+                -webkit-transform: translateX(-50%) translateY(-50%);
+        }
+        </style>
         <link rel="stylesheet" href="/js/bootstrap.min.css">
         <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
         <script type="text/javascript">
@@ -118,7 +128,7 @@ var TemplateTimeHtml = `{{define "T"}}
     <script type="text/javascript" src="/js/highcharts.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-    <div id="container" style="min-width: 310px; margin: 0 auto"></div>
+    <div id="container" class="center"></div>
     
 </body>
 </html>
