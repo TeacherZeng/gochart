@@ -39,7 +39,9 @@ var TemplateTimeHtml = `{{define "T"}}
                     type: 'datetime',
                     tickInterval: {{.TickInterval}},
                     labels: {
-                        format: '{value: %H:%M}'
+                        format: '{value: %H:%M}',
+                        step: {{.TickLabelStep}},
+                        staggerLines: 1
                     }
                 },
                 yAxis: {

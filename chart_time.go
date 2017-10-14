@@ -7,14 +7,19 @@ import (
 
 type ChartTime struct {
 	ChartBase
-	YMax         string
-	TickInterval string
+	YMax          string
+	TickInterval  string
+	TickLabelStep string
 }
 
 func (this *ChartTime) Build(dataArray string) {
 	if this.chartArgs == nil {
 		this.ChartBase.BuildBase(dataArray)
 		this.chartArgs["YMax"] = this.YMax
+		if this.TickLabelStep == "" {
+			this.TickLabelStep = "60"
+		}
+		this.chartArgs["TickLabelStep"] = this.TickLabelStep
 		v, _ := strconv.Atoi(this.RefreshTime)
 		this.chartArgs["TickInterval"] = strconv.Itoa(v * 1000)
 	} else {
