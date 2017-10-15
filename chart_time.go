@@ -10,6 +10,7 @@ type ChartTime struct {
 	YMax          string
 	TickInterval  string
 	TickLabelStep string
+	PlotLinesY    string
 }
 
 func (this *ChartTime) Build(dataArray string) {
@@ -20,6 +21,7 @@ func (this *ChartTime) Build(dataArray string) {
 			this.TickLabelStep = "60"
 		}
 		this.chartArgs["TickLabelStep"] = this.TickLabelStep
+		this.chartArgs["PlotLinesY"] = this.PlotLinesY
 		v, _ := strconv.Atoi(this.RefreshTime)
 		this.chartArgs["TickInterval"] = strconv.Itoa(v * 1000)
 	} else {

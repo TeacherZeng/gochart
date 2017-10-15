@@ -59,11 +59,7 @@ var TemplateTimeHtml = `{{define "T"}}
                         // text: 'Temperature (°C)'
                         text: '{{.YAxisText}}'
                     },
-                    plotLines: [{
-                        value: 0,
-                        width: 1,
-                        color: '#808080'
-                    }],
+                    plotLines: [{{.PlotLinesY}}],
                     max: {{.YMax}},
                     min: 0
                 },
