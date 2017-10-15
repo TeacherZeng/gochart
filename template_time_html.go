@@ -80,7 +80,10 @@ var TemplateTimeHtml = `{{define "T"}}
                 },
                 plotOptions: {
                     series: {
-                        animation: false
+                        animation: false,
+                        marker: {
+	                        radius: 1
+                        }
                     }
                 },
                 credits : {
