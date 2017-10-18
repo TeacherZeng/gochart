@@ -1,5 +1,0 @@
-package: github.com/bitly/gochart
-import:
-- package: github.com/bitly/go-simplejson
-- package: github.com/zieckey/goini
-- package: github.com/golang/glog
