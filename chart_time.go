@@ -15,38 +15,46 @@ type ChartTime struct {
 	TickUnit      int
 }
 
-func (this *ChartTime) Build(dataArray string) {
-	if this.chartArgs == nil {
-		this.ChartBase.BuildBase(dataArray)
-		this.chartArgs["YMax"] = this.YMax
-		if this.TickLabelStep == "" {
-			this.TickLabelStep = "60"
-		}
-		this.chartArgs["TickLabelStep"] = this.TickLabelStep
-		this.chartArgs["PlotLinesY"] = this.PlotLinesY
-		if this.TickUnit == 0 {
-			this.TickUnit = 1000
-		}
-		v, _ := strconv.Atoi(this.RefreshTime)
-		this.chartArgs["TickInterval"] = strconv.Itoa(v * this.TickUnit)
-	} else {
-		this.ChartBase.BuildBase(dataArray)
+func (this *ChartTime) Init() {
+	this.ChartBase.InitBase()
+	this.chartArgs["YMax"] = this.YMax
+	if this.TickLabelStep == "" {
+		this.TickLabelStep = "60"
 	}
+	this.chartArgs["TickLabelStep"] = this.TickLabelStep
+	this.chartArgs["PlotLinesY"] = this.PlotLinesY
+	if this.TickUnit == 0 {
+		this.TickUnit = 1000
+	}
+	this.chartArgs["TickInterval"] = strconv.Itoa(this.RefreshTime * this.TickUnit)
 }
 
 func (this *ChartTime) Template() string {
 	return TemplateTimeHtml
 }
 
-func (this *ChartTime) AddData(name string, data interface{}, UTCTime int64, samplenum, refreshtime int) *simplejson.Json {
+func (this *ChartTime) AddData(newDatas map[string][]interface{}, UTCTime int64) []interface{} {
 	endtime := 1000 * int(8*60*60+UTCTime)
-	begintime := endtime - this.TickUnit*samplenum*refreshtime
-	var json *simplejson.Json
-	json = simplejson.New()
-	json.Set("name", name)
-	json.Set("data", data)
-	json.Set("pointInterval", refreshtime*this.TickUnit)
-	json.Set("pointStart", begintime)
-	json.Set("pointEnd", endtime)
-	return json
+	begintime := endtime - this.TickUnit*this.SampleNum*this.RefreshTime
+	datas := make([]interface{}, 0)
+	for k, v := range newDatas {
+		if _, ok := this.chartData[k]; !ok {
+			this.chartData[k] = make([]interface{}, this.SampleNum)
+		}
+		for _, tempv := range v {
+			this.chartData[k] = append(this.chartData[k], tempv)
+		}
+		for len(this.chartData[k]) > this.SampleNum {
+			this.chartData[k] = this.chartData[k][1:]
+		}
+		var json *simplejson.Json
+		json = simplejson.New()
+		json.Set("name", k)
+		json.Set("data", this.chartData[k])
+		json.Set("pointInterval", this.RefreshTime*this.TickUnit)
+		json.Set("pointStart", begintime)
+		json.Set("pointEnd", endtime)
+		datas = append(datas, json)
+	}
+	return datas
 }

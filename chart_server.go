@@ -17,6 +17,7 @@ func (this *ChartServer) AddChart(chartname string, chart IChartInner, savedata 
 	if this.charts == nil {
 		this.charts = make(map[string]IChartInner)
 	}
+	chart.Init()
 	this.charts[chartname] = chart
 	if savedata {
 		chart.GoSaveData(chartname)
@@ -38,17 +39,16 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 		glog.Errorln("no find the chart, chartname =", chartname)
 		return
 	}
-
 	now := time.Now().Unix()
 
 	chart := this.charts[chartname]
 	datas := chart.Update(now)
 	chart.SaveData(datas)
+	outdatas := chart.AddData(datas, now)
 	json := simplejson.New()
-	json.Set("DataArray", datas)
+	json.Set("DataArray", outdatas)
 	b, _ := json.Get("DataArray").Encode()
 	chart.Build(string(b))
-
 	if t, err := template.New("foo").Parse(chart.Template()); err != nil {
 		w.Write([]byte(err.Error()))
 	} else {

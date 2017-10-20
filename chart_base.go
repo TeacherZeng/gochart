@@ -3,23 +3,26 @@ package gochart
 import (
 	"github.com/golang/glog"
 	"runtime/debug"
+	"strconv"
 	"time"
 )
 
 type IChart interface {
-	Update(now int64) []interface{}
+	Update(now int64) map[string][]interface{}
 }
 
 type IChartInner interface {
 	IChart
+	Init()
 	Template() string
 	Build(dataArray string)
 	Data() map[string]string
+	AddData(map[string][]interface{}, int64) []interface{}
 
 	// save data
 	GoSaveData(filename string)
 	IsEnableSaveData() bool
-	SaveData(datas []interface{})
+	SaveData(datas map[string][]interface{})
 }
 
 type ChartBase struct {
@@ -30,30 +33,37 @@ type ChartBase struct {
 	XAxisNumbers string
 	ValueSuffix  string
 	SeriesName   string
-	RefreshTime  string
+	RefreshTime  int
+	SampleNum    int
 	chartArgs    map[string]string
+
+	//chart data
+	chartData map[string][]interface{}
 
 	// save data
 	filename     string
-	saveData     []interface{}
-	chanSaveData chan []interface{}
+	saveData     map[string][]interface{}
+	chanSaveData chan map[string][]interface{}
 }
 
-func (this *ChartBase) BuildBase(dataArray string) {
-	if this.chartArgs == nil {
-		this.chartArgs = make(map[string]string)
-		this.chartArgs["ChartType"] = this.ChartType
-		this.chartArgs["Title"] = this.Title
-		this.chartArgs["SubTitle"] = this.SubTitle
-		this.chartArgs["YAxisText"] = this.YAxisText
-		this.chartArgs["XAxisNumbers"] = this.XAxisNumbers
-		this.chartArgs["ValueSuffix"] = this.ValueSuffix
-		this.chartArgs["SeriesName"] = this.SeriesName
-		if this.RefreshTime == "" {
-			this.RefreshTime = "60"
-		}
-		this.chartArgs["RefreshTime"] = this.RefreshTime
+func (this *ChartBase) InitBase() {
+	this.chartArgs = make(map[string]string)
+	this.chartArgs["ChartType"] = this.ChartType
+	this.chartArgs["Title"] = this.Title
+	this.chartArgs["SubTitle"] = this.SubTitle
+	this.chartArgs["YAxisText"] = this.YAxisText
+	this.chartArgs["XAxisNumbers"] = this.XAxisNumbers
+	this.chartArgs["ValueSuffix"] = this.ValueSuffix
+	this.chartArgs["SeriesName"] = this.SeriesName
+	if this.RefreshTime == 0 {
+		this.RefreshTime = 60
 	}
+	this.chartArgs["RefreshTime"] = strconv.Itoa(this.RefreshTime)
+
+	this.chartData = make(map[string][]interface{})
+}
+
+func (this *ChartBase) Build(dataArray string) {
 	this.chartArgs["DataArray"] = dataArray
 }
 
@@ -63,8 +73,8 @@ func (this *ChartBase) Data() map[string]string {
 
 func (this *ChartBase) GoSaveData(filename string) {
 	this.filename = filename
-	this.chanSaveData = make(chan []interface{}, 1)
-	this.saveData = make([]interface{}, 0)
+	this.chanSaveData = make(chan map[string][]interface{}, 1)
+	this.saveData = make(map[string][]interface{})
 
 	go func() {
 		defer func() {
@@ -79,19 +89,12 @@ func (this *ChartBase) GoSaveData(filename string) {
 		case datas := <-this.chanSaveData:
 			if len(datas) > 0 {
 				newDataFlag = true
-
-				data := datas[len(datas)-1]
-				this.saveData = append(this.saveData, data)
-
-				//			datas := make([]interface{}, 0)
-				//			var json *simplejson.Json
-				//			json = simplejson.New()
-				//			json.Set("name", name)
-				//			json.Set("data", data)
-				//			json.Set("pointInterval", refreshtime*this.TickUnit)
-				//			json.Set("pointStart", begintime)
-				//			json.Set("pointEnd", endtime)
-				//			datas = append(datas, json)
+				for k, v := range datas {
+					if _, ok := this.saveData[k]; !ok {
+						this.saveData[k] = make([]interface{}, 0)
+					}
+					this.saveData[k] = append(this.saveData[k], v)
+				}
 			}
 		case <-tick.C:
 			if newDataFlag {
@@ -105,6 +108,8 @@ func (this *ChartBase) IsEnableSaveData() bool {
 	return this.filename != ""
 }
 
-func (this *ChartBase) SaveData(datas []interface{}) {
-	this.chanSaveData <- datas
+func (this *ChartBase) SaveData(datas map[string][]interface{}) {
+	if this.chanSaveData != nil {
+		this.chanSaveData <- datas
+	}
 }
