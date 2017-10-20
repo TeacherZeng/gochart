@@ -1,9 +1,11 @@
 package gochart
 
 import (
+	"github.com/bitly/go-simplejson"
 	"github.com/golang/glog"
 	"runtime/debug"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -18,6 +20,7 @@ type IChartInner interface {
 	Build(dataArray string)
 	Data() map[string]string
 	AddData(map[string][]interface{}, int64) []interface{}
+	GetSaveData() []interface{}
 
 	// save data
 	GoSaveData(filename string)
@@ -36,6 +39,7 @@ type ChartBase struct {
 	RefreshTime  int
 	SampleNum    int
 	chartArgs    map[string]string
+	m            sync.RWMutex
 
 	//chart data
 	chartData map[string][]interface{}
@@ -44,6 +48,7 @@ type ChartBase struct {
 	filename     string
 	saveData     map[string][]interface{}
 	chanSaveData chan map[string][]interface{}
+	beginTime    int64
 }
 
 func (this *ChartBase) InitBase() {
@@ -64,7 +69,9 @@ func (this *ChartBase) InitBase() {
 }
 
 func (this *ChartBase) Build(dataArray string) {
+	this.m.Lock()
 	this.chartArgs["DataArray"] = dataArray
+	this.m.Unlock()
 }
 
 func (this *ChartBase) Data() map[string]string {
@@ -89,17 +96,40 @@ func (this *ChartBase) GoSaveData(filename string) {
 			select {
 			case datas := <-this.chanSaveData:
 				if len(datas) > 0 {
+
+					if this.beginTime == 0 {
+						this.beginTime = time.Now().Unix()
+					}
+
 					newDataFlag = true
 					for k, v := range datas {
 						if _, ok := this.saveData[k]; !ok {
 							this.saveData[k] = make([]interface{}, 0)
 						}
-						this.saveData[k] = append(this.saveData[k], v)
+						for _, tempv := range v {
+							this.saveData[k] = append(this.saveData[k], tempv)
+						}
 					}
 				}
 			case <-tick.C:
 				if newDataFlag {
 					newDataFlag = false
+
+					root := simplejson.New()
+					this.m.RLock()
+					for key, val := range this.chartArgs {
+						root.Set(key, val)
+					}
+					this.m.RUnlock()
+
+					root.Set("beginTime", this.beginTime)
+
+					//					outdatas := this.GetSaveData()
+					//					json := simplejson.New()
+					//					json.Set("DataArray", outdatas)
+					//					b, _ := json.Get("DataArray").Encode()
+					//					string(b)
+
 				}
 			}
 		}
