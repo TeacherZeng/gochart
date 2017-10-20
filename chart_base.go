@@ -1,5 +1,11 @@
 package gochart
 
+import (
+	"github.com/golang/glog"
+	"runtime/debug"
+	"time"
+)
+
 type IChart interface {
 	Update(now int64) []interface{}
 }
@@ -9,6 +15,11 @@ type IChartInner interface {
 	Template() string
 	Build(dataArray string)
 	Data() map[string]string
+
+	// save data
+	GoSaveData(filename string)
+	IsEnableSaveData() bool
+	SaveData(datas []interface{})
 }
 
 type ChartBase struct {
@@ -21,6 +32,11 @@ type ChartBase struct {
 	SeriesName   string
 	RefreshTime  string
 	chartArgs    map[string]string
+
+	// save data
+	filename     string
+	saveData     []interface{}
+	chanSaveData chan []interface{}
 }
 
 func (this *ChartBase) BuildBase(dataArray string) {
@@ -43,4 +59,52 @@ func (this *ChartBase) BuildBase(dataArray string) {
 
 func (this *ChartBase) Data() map[string]string {
 	return this.chartArgs
+}
+
+func (this *ChartBase) GoSaveData(filename string) {
+	this.filename = filename
+	this.chanSaveData = make(chan []interface{}, 1)
+	this.saveData = make([]interface{}, 0)
+
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				glog.Errorln("[异常] ", err, "\n", string(debug.Stack()))
+			}
+		}()
+
+		newDataFlag := false
+		tick := time.NewTicker(30 * time.Second)
+		select {
+		case datas := <-this.chanSaveData:
+			if len(datas) > 0 {
+				newDataFlag = true
+
+				data := datas[len(datas)-1]
+				this.saveData = append(this.saveData, data)
+
+				//			datas := make([]interface{}, 0)
+				//			var json *simplejson.Json
+				//			json = simplejson.New()
+				//			json.Set("name", name)
+				//			json.Set("data", data)
+				//			json.Set("pointInterval", refreshtime*this.TickUnit)
+				//			json.Set("pointStart", begintime)
+				//			json.Set("pointEnd", endtime)
+				//			datas = append(datas, json)
+			}
+		case <-tick.C:
+			if newDataFlag {
+				newDataFlag = false
+			}
+		}
+	}()
+}
+
+func (this *ChartBase) IsEnableSaveData() bool {
+	return this.filename != ""
+}
+
+func (this *ChartBase) SaveData(datas []interface{}) {
+	this.chanSaveData <- datas
 }

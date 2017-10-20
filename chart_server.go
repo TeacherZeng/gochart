@@ -13,11 +13,14 @@ type ChartServer struct {
 	charts map[string]IChartInner
 }
 
-func (this *ChartServer) AddChart(chartname string, chart IChartInner) {
+func (this *ChartServer) AddChart(chartname string, chart IChartInner, savedata bool) {
 	if this.charts == nil {
 		this.charts = make(map[string]IChartInner)
 	}
 	this.charts[chartname] = chart
+	if savedata {
+		chart.GoSaveData(chartname)
+	}
 }
 
 func (this *ChartServer) ListenAndServe(addr string) error {
@@ -40,6 +43,7 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 
 	chart := this.charts[chartname]
 	datas := chart.Update(now)
+	chart.SaveData(datas)
 	json := simplejson.New()
 	json.Set("DataArray", datas)
 	b, _ := json.Get("DataArray").Encode()
