@@ -85,20 +85,22 @@ func (this *ChartBase) GoSaveData(filename string) {
 
 		newDataFlag := false
 		tick := time.NewTicker(30 * time.Second)
-		select {
-		case datas := <-this.chanSaveData:
-			if len(datas) > 0 {
-				newDataFlag = true
-				for k, v := range datas {
-					if _, ok := this.saveData[k]; !ok {
-						this.saveData[k] = make([]interface{}, 0)
+		for {
+			select {
+			case datas := <-this.chanSaveData:
+				if len(datas) > 0 {
+					newDataFlag = true
+					for k, v := range datas {
+						if _, ok := this.saveData[k]; !ok {
+							this.saveData[k] = make([]interface{}, 0)
+						}
+						this.saveData[k] = append(this.saveData[k], v)
 					}
-					this.saveData[k] = append(this.saveData[k], v)
 				}
-			}
-		case <-tick.C:
-			if newDataFlag {
-				newDataFlag = false
+			case <-tick.C:
+				if newDataFlag {
+					newDataFlag = false
+				}
 			}
 		}
 	}()
