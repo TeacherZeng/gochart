@@ -34,13 +34,22 @@ func (this *ChartServer) ListenAndServe(addr string) error {
 func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	chartname := values.Get("query")
-
-	if _, ok := this.charts[chartname]; !ok {
+	if chartname == "" {
+		glog.Errorln("usage: http://localhost:8000?query=cpu")
+		return
+	}
+	if _, ok := this.charts[chartname]; ok {
+		this.queryChart(chartname, w, r)
+	} else if this.isExistFile(chartname) {
+		this.queryChartFile(chartname, w, r)
+	} else {
 		glog.Errorln("no find the chart, chartname =", chartname)
 		return
 	}
-	now := time.Now().Unix()
+}
 
+func (this *ChartServer) queryChart(chartname string, w http.ResponseWriter, r *http.Request) {
+	now := time.Now().Unix()
 	chart := this.charts[chartname]
 	datas := chart.Update(now)
 	chart.SaveData(datas)
@@ -56,6 +65,21 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(err.Error()))
 		}
 	}
+}
+
+func (this *ChartServer) queryChartFile(chartname string, w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (this *ChartServer) isExistFile(chartname string) bool {
+	wd, err1 := os.Getwd()
+	if err1 != nil {
+		glog.Errorln(err1)
+		return false
+	}
+	filename := wd + "/" + chartname
+	_, err2 := os.Stat(filename)
+	return err2 == nil || os.IsExist(err2)
 }
 
 func (this *ChartServer) js(w http.ResponseWriter, r *http.Request) {
