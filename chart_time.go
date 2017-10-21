@@ -7,17 +7,15 @@ import (
 
 type ChartTime struct {
 	ChartBase
-	YMax          string
 	TickInterval  string
 	TickLabelStep string
 	PlotLinesY    string
-	TickFormat    string
 	TickUnit      int
 }
 
 func (this *ChartTime) Init() {
 	this.ChartBase.InitBase()
-	this.chartArgs["YMax"] = this.YMax
+	this.chartClassType = CCT_TIME
 	if this.TickLabelStep == "" {
 		this.TickLabelStep = "60"
 	}
@@ -57,4 +55,12 @@ func (this *ChartTime) AddData(newDatas map[string][]interface{}, UTCTime int64)
 		datas = append(datas, json)
 	}
 	return datas
+}
+
+func (this *ChartTime) Load(filename string) bool {
+	if this.LoadBase(filename) == false {
+		return false
+	}
+
+	return true
 }

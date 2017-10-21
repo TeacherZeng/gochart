@@ -1,6 +1,7 @@
 package gochart
 
 import (
+	"fmt"
 	"github.com/bitly/go-simplejson"
 	"github.com/golang/glog"
 	"io/ioutil"
@@ -17,6 +18,7 @@ type IChart interface {
 type IChartInner interface {
 	IChart
 	IChartSave
+	IChartFile
 	Init()
 	Template() string
 	Build(dataArray string)
@@ -30,6 +32,17 @@ type IChartSave interface {
 	SaveData(datas map[string][]interface{})
 }
 
+type IChartFile interface {
+	Load(filename string) bool
+}
+
+type ChartClassType int
+
+const (
+	CCT_UNKNOW ChartClassType = iota
+	CCT_TIME
+)
+
 type ChartBase struct {
 	ChartType    string
 	Title        string
@@ -37,11 +50,12 @@ type ChartBase struct {
 	YAxisText    string
 	XAxisNumbers string
 	ValueSuffix  string
-	SeriesName   string
+	YMax         string
 	RefreshTime  int
 	SampleNum    int
-	chartArgs    map[string]string
-	m            sync.RWMutex
+
+	chartArgs map[string]string
+	m         sync.RWMutex
 
 	//chart data
 	chartData map[string][]interface{}
@@ -51,6 +65,8 @@ type ChartBase struct {
 	saveData     map[string][]interface{}
 	chanSaveData chan map[string][]interface{}
 	beginTime    int64
+
+	chartClassType ChartClassType
 }
 
 func (this *ChartBase) InitBase() {
@@ -61,7 +77,7 @@ func (this *ChartBase) InitBase() {
 	this.chartArgs["YAxisText"] = this.YAxisText
 	this.chartArgs["XAxisNumbers"] = this.XAxisNumbers
 	this.chartArgs["ValueSuffix"] = this.ValueSuffix
-	this.chartArgs["SeriesName"] = this.SeriesName
+	this.chartArgs["YMax"] = this.YMax
 	if this.RefreshTime == 0 {
 		this.RefreshTime = 60
 	}
@@ -81,7 +97,7 @@ func (this *ChartBase) Data() map[string]string {
 }
 
 func (this *ChartBase) GoSaveData(filename string) {
-	this.filename = filename + ".chart"
+	this.filename = fmt.Sprintf("%s_type%d.chart", filename, int(this.chartClassType))
 	this.chanSaveData = make(chan map[string][]interface{}, 1)
 	this.saveData = make(map[string][]interface{})
 
@@ -126,6 +142,12 @@ func (this *ChartBase) GoSaveData(filename string) {
 
 					root.Set("beginTime", this.beginTime)
 
+					tmplen := 0
+					for _, val := range this.chartData {
+						tmplen = len(val)
+					}
+					root.Set("SampleNum", tmplen)
+
 					outdatas := make([]interface{}, 0)
 					for k, v := range this.saveData {
 						json := simplejson.New()
@@ -154,4 +176,31 @@ func (this *ChartBase) SaveData(datas map[string][]interface{}) {
 	if this.chanSaveData != nil {
 		this.chanSaveData <- datas
 	}
+}
+
+func (this *ChartTime) LoadBase(filename string) bool {
+	data, err1 := ioutil.ReadFile(filename)
+	if err1 != nil {
+		glog.Errorln(err1)
+		return false
+	}
+
+	json, err2 := simplejson.NewJson(data)
+	if err2 != nil {
+		glog.Errorln(err2)
+		return false
+	}
+
+	this.ChartType, _ = json.Get("ChartType").String()
+	this.Title, _ = json.Get("Title").String()
+	this.SubTitle, _ = json.Get("SubTitle").String()
+	this.YAxisText, _ = json.Get("YAxisText").String()
+	this.XAxisNumbers, _ = json.Get("XAxisNumbers").String()
+	this.ValueSuffix, _ = json.Get("ValueSuffix").String()
+	this.YMax, _ = json.Get("YMax").String()
+	this.RefreshTime, _ = json.Get("RefreshTime").Int()
+	this.SampleNum, _ = json.Get("SampleNum").Int()
+	this.beginTime, _ = json.Get("beginTime").Int64()
+
+	return true
 }

@@ -5,6 +5,8 @@ import (
 	"github.com/golang/glog"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -35,13 +37,13 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	chartname := values.Get("query")
 	if chartname == "" {
-		glog.Errorln("usage: http://localhost:8000?query=cpu")
+		glog.Errorln("usage: http://your_ip:8000?query=cpu")
 		return
 	}
 	if _, ok := this.charts[chartname]; ok {
 		this.queryChart(chartname, w, r)
-	} else if this.isExistFile(chartname) {
-		this.queryChartFile(chartname, w, r)
+	} else if ok, path := this.isExistFile(chartname); ok {
+		this.queryChartFile(chartname, path, w, r)
 	} else {
 		glog.Errorln("no find the chart, chartname =", chartname)
 		return
@@ -67,19 +69,35 @@ func (this *ChartServer) queryChart(chartname string, w http.ResponseWriter, r *
 	}
 }
 
-func (this *ChartServer) queryChartFile(chartname string, w http.ResponseWriter, r *http.Request) {
+func (this *ChartServer) queryChartFile(chartname, path string, w http.ResponseWriter, r *http.Request) {
+	s := strings.Split(chartname, "_")
+	if len(s) < 2 || len(s[1]) < 5 {
+		glog.Errorln("chart file name error! file =", chartname)
+		return
+	}
 
+	var chart IChartFile
+	ct, _ := strconv.Atoi(string(s[1][4]))
+	switch ChartClassType(ct) {
+	case CCT_TIME:
+		chart = &ChartTime{}
+	default:
+		glog.Errorln("chart file type error! file =", chartname)
+		return
+	}
+
+	chart.Load(path)
 }
 
-func (this *ChartServer) isExistFile(chartname string) bool {
+func (this *ChartServer) isExistFile(chartname string) (bool, string) {
 	wd, err1 := os.Getwd()
 	if err1 != nil {
 		glog.Errorln(err1)
-		return false
+		return false, ""
 	}
 	filename := wd + "/" + chartname
 	_, err2 := os.Stat(filename)
-	return err2 == nil || os.IsExist(err2)
+	return err2 == nil || os.IsExist(err2), filename
 }
 
 func (this *ChartServer) js(w http.ResponseWriter, r *http.Request) {
