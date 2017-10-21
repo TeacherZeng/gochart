@@ -3,6 +3,7 @@ package gochart
 import (
 	"github.com/bitly/go-simplejson"
 	"github.com/golang/glog"
+	"io/ioutil"
 	"runtime/debug"
 	"strconv"
 	"sync"
@@ -15,14 +16,15 @@ type IChart interface {
 
 type IChartInner interface {
 	IChart
+	IChartSave
 	Init()
 	Template() string
 	Build(dataArray string)
 	Data() map[string]string
 	AddData(map[string][]interface{}, int64) []interface{}
-	GetSaveData() []interface{}
+}
 
-	// save data
+type IChartSave interface {
 	GoSaveData(filename string)
 	IsEnableSaveData() bool
 	SaveData(datas map[string][]interface{})
@@ -79,7 +81,7 @@ func (this *ChartBase) Data() map[string]string {
 }
 
 func (this *ChartBase) GoSaveData(filename string) {
-	this.filename = filename
+	this.filename = filename + ".chart"
 	this.chanSaveData = make(chan map[string][]interface{}, 1)
 	this.saveData = make(map[string][]interface{})
 
@@ -124,12 +126,20 @@ func (this *ChartBase) GoSaveData(filename string) {
 
 					root.Set("beginTime", this.beginTime)
 
-					//					outdatas := this.GetSaveData()
-					//					json := simplejson.New()
-					//					json.Set("DataArray", outdatas)
-					//					b, _ := json.Get("DataArray").Encode()
-					//					string(b)
+					outdatas := make([]interface{}, 0)
+					for k, v := range this.saveData {
+						json := simplejson.New()
+						json.Set("name", k)
+						json.Set("data", v)
+						outdatas = append(outdatas, json)
+					}
+					json := simplejson.New()
+					json.Set("DataArray", outdatas)
+					b, _ := json.Get("DataArray").Encode()
+					root.Set("DataArray", string(b))
 
+					s, _ := root.MarshalJSON()
+					ioutil.WriteFile(this.filename, []byte(s), 0666)
 				}
 			}
 		}

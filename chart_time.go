@@ -58,18 +58,3 @@ func (this *ChartTime) AddData(newDatas map[string][]interface{}, UTCTime int64)
 	}
 	return datas
 }
-
-func (this *ChartTime) GetSaveData() []interface{} {
-	datas := make([]interface{}, 0)
-	for k, v := range this.saveData {
-		var json *simplejson.Json
-		json = simplejson.New()
-		json.Set("name", k)
-		json.Set("data", v)
-		json.Set("pointInterval", this.RefreshTime*this.TickUnit)
-		json.Set("pointStart", "POINTSTART")
-		json.Set("pointEnd", "POINTEND")
-		datas = append(datas, json)
-	}
-	return datas
-}
