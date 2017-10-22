@@ -99,7 +99,9 @@ func (this *ChartServer) queryChartFile(chartname, path string, w http.ResponseW
 	if t, err := template.New("foo").Parse(chart.Template()); err != nil {
 		w.Write([]byte(err.Error()))
 	} else {
-		if err = t.ExecuteTemplate(w, "T", chart.Data()); err != nil {
+		data := chart.Data()
+		data["RefreshTime"] = "99999"
+		if err = t.ExecuteTemplate(w, "T", data); err != nil {
 			w.Write([]byte(err.Error()))
 		}
 	}

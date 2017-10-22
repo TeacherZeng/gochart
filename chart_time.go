@@ -76,14 +76,29 @@ func (this *ChartTime) Load(filename string) (bool, []interface{}) {
 	arrays, _ := json.Get("DataArray").Array()
 
 	datas := make([]interface{}, 0)
-	endtime := this.beginTime + int64(this.TickUnit*this.SampleNum*this.RefreshTime)
 	for _, val := range arrays {
 		temp := val.(map[string]interface{})
+		temparray := temp["data"].([]interface{})
+		begintime := int64(0)
+		endtime := int64(0)
+		templen := len(temparray)
+		if templen < this.SampleNum {
+			temparray2 := make([]interface{}, this.SampleNum-templen)
+			for _, val := range temparray {
+				temparray2 = append(temparray2, val)
+			}
+			temparray = temparray2
+			begintime = 1000*(8*60*60+this.beginTime) - int64(this.TickUnit*(this.SampleNum-templen)*this.RefreshTime)
+			endtime = begintime + int64(this.TickUnit*this.SampleNum*this.RefreshTime)
+		} else {
+			begintime = 1000 * (8*60*60 + this.beginTime)
+			endtime = begintime + int64(this.TickUnit*templen*this.RefreshTime)
+		}
 		json := simplejson.New()
 		json.Set("name", temp["name"])
-		json.Set("data", temp["data"])
+		json.Set("data", temparray)
 		json.Set("pointInterval", this.RefreshTime*this.TickUnit)
-		json.Set("pointStart", this.beginTime)
+		json.Set("pointStart", begintime)
 		json.Set("pointEnd", endtime)
 		datas = append(datas, json)
 	}
