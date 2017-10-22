@@ -126,7 +126,7 @@ var TemplateTimeHtml = `{{define "T"}}
     <body>
     <script type="text/javascript" src="/js/highstock.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
-    <div id="container" class="center"></div>
+    <div id="container" style="height: 500px"></div>
     
 </body>
 </html>
