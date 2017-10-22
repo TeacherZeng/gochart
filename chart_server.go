@@ -96,7 +96,7 @@ func (this *ChartServer) queryChartFile(chartname, path string, w http.ResponseW
 	json.Set("DataArray", outdatas)
 	b, _ := json.Get("DataArray").Encode()
 	chart.Build(string(b))
-	if t, err := template.New("foo").Parse(chart.Template()); err != nil {
+	if t, err := template.New("foo").Parse(chart.TemplateScrollBars()); err != nil {
 		w.Write([]byte(err.Error()))
 	} else {
 		data := chart.Data()

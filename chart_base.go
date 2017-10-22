@@ -38,6 +38,7 @@ type IChartSave interface {
 type IChartFile interface {
 	ICharNormal
 	Load(filename string) (bool, []interface{})
+	TemplateScrollBars() string
 }
 
 type ChartClassType int

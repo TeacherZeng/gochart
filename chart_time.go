@@ -33,6 +33,10 @@ func (this *ChartTime) Template() string {
 	return TemplateTimeHtml
 }
 
+func (this *ChartTime) TemplateScrollBars() string {
+	return TemplateTimeHtml_ScrollBars
+}
+
 func (this *ChartTime) AddData(newDatas map[string][]interface{}, UTCTime int64) []interface{} {
 	endtime := 1000 * int(8*60*60+UTCTime)
 	begintime := endtime - this.TickUnit*this.SampleNum*this.RefreshTime

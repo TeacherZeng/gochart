@@ -3,7 +3,7 @@ package gochart
 // see the resource of : http://www.freecdn.cn/libs/highcharts/
 
 // spline,line,column,area,bar
-var TemplateTimeHtml = `{{define "T"}}
+var TemplateTimeHtml_ScrollBars = `{{define "T"}}
 <!DOCTYPE HTML>
 <html>
     <head>
@@ -24,7 +24,7 @@ var TemplateTimeHtml = `{{define "T"}}
         <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
         <script type="text/javascript">
         $(function () {
-            $('#container').highcharts({
+            Highcharts.stockChart('container', {
                 chart: {
                     // type: 'spline'
                     type: '{{.ChartType}}',
@@ -124,9 +124,9 @@ var TemplateTimeHtml = `{{define "T"}}
         </script>
     </head>
     <body>
-    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <script type="text/javascript" src="/js/highstock.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
-    <div id="container" class="center"></div>
+    <div id="container" style="height: 500px"></div>
     
 </body>
 </html>
