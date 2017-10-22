@@ -1,7 +1,9 @@
 package gochart
 
 import (
+	"fmt"
 	"github.com/bitly/go-simplejson"
+	_ "github.com/golang/glog"
 	"strconv"
 )
 
@@ -57,10 +59,33 @@ func (this *ChartTime) AddData(newDatas map[string][]interface{}, UTCTime int64)
 	return datas
 }
 
-func (this *ChartTime) Load(filename string) bool {
-	if this.LoadBase(filename) == false {
-		return false
+func (this *ChartTime) Load(filename string) (bool, []interface{}) {
+	ok, root := this.LoadBase(filename)
+	if !ok {
+		return false, nil
 	}
+	this.TickInterval, _ = root.Get("TickInterval").String()
+	this.TickLabelStep, _ = root.Get("TickLabelStep").String()
+	this.PlotLinesY, _ = root.Get("PlotLinesY").String()
+	tmpv, _ := strconv.Atoi(this.TickInterval)
+	this.TickUnit = tmpv / this.RefreshTime
 
-	return true
+	outdatas, _ := root.Get("DataArray").String()
+	outdatas = fmt.Sprintf("{\"DataArray\":%s}", outdatas)
+	json, _ := simplejson.NewJson([]byte(outdatas))
+	arrays, _ := json.Get("DataArray").Array()
+
+	datas := make([]interface{}, 0)
+	endtime := this.beginTime + int64(this.TickUnit*this.SampleNum*this.RefreshTime)
+	for _, val := range arrays {
+		temp := val.(map[string]interface{})
+		json := simplejson.New()
+		json.Set("name", temp["name"])
+		json.Set("data", temp["data"])
+		json.Set("pointInterval", this.RefreshTime*this.TickUnit)
+		json.Set("pointStart", this.beginTime)
+		json.Set("pointEnd", endtime)
+		datas = append(datas, json)
+	}
+	return true, datas
 }

@@ -18,7 +18,10 @@ type IChart interface {
 type IChartInner interface {
 	IChart
 	IChartSave
-	IChartFile
+	ICharNormal
+}
+
+type ICharNormal interface {
 	Init()
 	Template() string
 	Build(dataArray string)
@@ -33,7 +36,8 @@ type IChartSave interface {
 }
 
 type IChartFile interface {
-	Load(filename string) bool
+	ICharNormal
+	Load(filename string) (bool, []interface{})
 }
 
 type ChartClassType int
@@ -178,17 +182,17 @@ func (this *ChartBase) SaveData(datas map[string][]interface{}) {
 	}
 }
 
-func (this *ChartTime) LoadBase(filename string) bool {
+func (this *ChartTime) LoadBase(filename string) (bool, *simplejson.Json) {
 	data, err1 := ioutil.ReadFile(filename)
 	if err1 != nil {
 		glog.Errorln(err1)
-		return false
+		return false, nil
 	}
 
 	json, err2 := simplejson.NewJson(data)
 	if err2 != nil {
 		glog.Errorln(err2)
-		return false
+		return false, nil
 	}
 
 	this.ChartType, _ = json.Get("ChartType").String()
@@ -198,9 +202,10 @@ func (this *ChartTime) LoadBase(filename string) bool {
 	this.XAxisNumbers, _ = json.Get("XAxisNumbers").String()
 	this.ValueSuffix, _ = json.Get("ValueSuffix").String()
 	this.YMax, _ = json.Get("YMax").String()
-	this.RefreshTime, _ = json.Get("RefreshTime").Int()
+	tmpv, _ := json.Get("RefreshTime").String()
+	this.RefreshTime, _ = strconv.Atoi(tmpv)
 	this.SampleNum, _ = json.Get("SampleNum").Int()
 	this.beginTime, _ = json.Get("beginTime").Int64()
 
-	return true
+	return true, json
 }

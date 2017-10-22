@@ -86,7 +86,23 @@ func (this *ChartServer) queryChartFile(chartname, path string, w http.ResponseW
 		return
 	}
 
-	chart.Load(path)
+	ok, outdatas := chart.Load(path)
+	if !ok {
+		glog.Errorln("load chart file fail! file =", chartname)
+		return
+	}
+	chart.Init()
+	json := simplejson.New()
+	json.Set("DataArray", outdatas)
+	b, _ := json.Get("DataArray").Encode()
+	chart.Build(string(b))
+	if t, err := template.New("foo").Parse(chart.Template()); err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		if err = t.ExecuteTemplate(w, "T", chart.Data()); err != nil {
+			w.Write([]byte(err.Error()))
+		}
+	}
 }
 
 func (this *ChartServer) isExistFile(chartname string) (bool, string) {
