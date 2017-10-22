@@ -20,11 +20,11 @@ var TemplateTimeHtml = `{{define "T"}}
                 -webkit-transform: translateX(-50%) translateY(-50%);
         }
         </style>
-        <link rel="stylesheet" href="/js/bootstrap.min.css">
+        <link rel="stylesheet" href="/js/highcharts.css">
         <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
         <script type="text/javascript">
         $(function () {
-            $('#container').highcharts({
+            Highcharts.stockChart('container', {
                 chart: {
                     // type: 'spline'
                     type: '{{.ChartType}}',
@@ -124,9 +124,8 @@ var TemplateTimeHtml = `{{define "T"}}
         </script>
     </head>
     <body>
-    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <script type="text/javascript" src="/js/highstock.js"></script>
     <script type="text/javascript" src="/js/exporting.js"></script>
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
     <div id="container" class="center"></div>
     
 </body>
