@@ -3,7 +3,6 @@ package gochart
 import (
 	"fmt"
 	"github.com/bitly/go-simplejson"
-	"github.com/golang/glog"
 	"io/ioutil"
 	"runtime/debug"
 	"strconv"

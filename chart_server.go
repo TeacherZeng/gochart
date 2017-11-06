@@ -2,7 +2,6 @@ package gochart
 
 import (
 	"github.com/bitly/go-simplejson"
-	"github.com/golang/glog"
 	"net/http"
 	"os"
 	"strconv"
