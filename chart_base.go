@@ -2,12 +2,13 @@ package gochart
 
 import (
 	"fmt"
-	"github.com/bitly/go-simplejson"
 	"io/ioutil"
 	"runtime/debug"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/bitly/go-simplejson"
 )
 
 type IChart interface {
@@ -108,7 +109,7 @@ func (this *ChartBase) GoSaveData(filename string) {
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				glog.Errorln("[异常] ", err, "\n", string(debug.Stack()))
+				xlog.Errorln("[异常] ", err, "\n", string(debug.Stack()))
 			}
 		}()
 
@@ -185,13 +186,13 @@ func (this *ChartBase) SaveData(datas map[string][]interface{}) {
 func (this *ChartTime) LoadBase(filename string) (bool, *simplejson.Json) {
 	data, err1 := ioutil.ReadFile(filename)
 	if err1 != nil {
-		glog.Errorln(err1)
+		xlog.Errorln(err1)
 		return false, nil
 	}
 
 	json, err2 := simplejson.NewJson(data)
 	if err2 != nil {
-		glog.Errorln(err2)
+		xlog.Errorln(err2)
 		return false, nil
 	}
 

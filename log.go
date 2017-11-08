@@ -35,9 +35,9 @@ func (this *DefaultLogger) Infoln(args ...interface{}) {
 }
 
 var (
-	glog ILogger = NewDefaultLogger()
+	xlog ILogger = NewDefaultLogger()
 )
 
 func SetLogger(log ILogger) {
-	glog = log
+	xlog = log
 }

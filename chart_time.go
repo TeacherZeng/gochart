@@ -2,8 +2,9 @@ package gochart
 
 import (
 	"fmt"
-	"github.com/bitly/go-simplejson"
 	"strconv"
+
+	"github.com/bitly/go-simplejson"
 )
 
 type ChartTime struct {

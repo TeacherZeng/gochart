@@ -1,13 +1,14 @@
 package gochart
 
 import (
-	"github.com/bitly/go-simplejson"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/bitly/go-simplejson"
 )
 
 type ChartServer struct {
@@ -36,7 +37,7 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	chartname := values.Get("query")
 	if chartname == "" {
-		glog.Errorln("usage: http://your_ip:8000?query=cpu")
+		xlog.Errorln("usage: http://your_ip:8000?query=cpu")
 		return
 	}
 	if _, ok := this.charts[chartname]; ok {
@@ -44,7 +45,7 @@ func (this *ChartServer) handler(w http.ResponseWriter, r *http.Request) {
 	} else if ok, path := this.isExistFile(chartname); ok {
 		this.queryChartFile(chartname, path, w, r)
 	} else {
-		glog.Errorln("no find the chart, chartname =", chartname)
+		xlog.Errorln("no find the chart, chartname =", chartname)
 		return
 	}
 }
@@ -71,7 +72,7 @@ func (this *ChartServer) queryChart(chartname string, w http.ResponseWriter, r *
 func (this *ChartServer) queryChartFile(chartname, path string, w http.ResponseWriter, r *http.Request) {
 	s := strings.Split(chartname, "_")
 	if len(s) < 2 || len(s[1]) < 5 {
-		glog.Errorln("chart file name error! file =", chartname)
+		xlog.Errorln("chart file name error! file =", chartname)
 		return
 	}
 
@@ -81,13 +82,13 @@ func (this *ChartServer) queryChartFile(chartname, path string, w http.ResponseW
 	case CCT_TIME:
 		chart = &ChartTime{}
 	default:
-		glog.Errorln("chart file type error! file =", chartname)
+		xlog.Errorln("chart file type error! file =", chartname)
 		return
 	}
 
 	ok, outdatas := chart.Load(path)
 	if !ok {
-		glog.Errorln("load chart file fail! file =", chartname)
+		xlog.Errorln("load chart file fail! file =", chartname)
 		return
 	}
 	chart.Init()
@@ -109,7 +110,7 @@ func (this *ChartServer) queryChartFile(chartname, path string, w http.ResponseW
 func (this *ChartServer) isExistFile(chartname string) (bool, string) {
 	wd, err1 := os.Getwd()
 	if err1 != nil {
-		glog.Errorln(err1)
+		xlog.Errorln(err1)
 		return false, ""
 	}
 	filename := wd + "/" + chartname
@@ -120,7 +121,7 @@ func (this *ChartServer) isExistFile(chartname string) (bool, string) {
 func (this *ChartServer) js(w http.ResponseWriter, r *http.Request) {
 	wd, err := os.Getwd()
 	if err != nil {
-		glog.Errorln(err)
+		xlog.Errorln(err)
 		return
 	}
 	http.FileServer(http.Dir(wd)).ServeHTTP(w, r)
